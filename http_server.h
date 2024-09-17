@@ -5,6 +5,8 @@
 class HttpServer {
 public:
     static constexpr const char *VERSION = "1.0.0";
+
+    void start();
 };
 
 

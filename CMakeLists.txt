@@ -25,5 +25,8 @@ add_executable(http-server main.cpp
         http_server_config.h
         http_server.cpp
         http_server.h
-        http_server_mode.h)
+        http_server_mode.h
+        http_server_builder.cpp
+        http_server_builder.h
+)
 target_link_libraries(http-server PRIVATE argparse::argparse yaml-cpp::yaml-cpp)

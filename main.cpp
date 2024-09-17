@@ -3,6 +3,7 @@
 #include <argparse/argparse.hpp>
 #include "http_server.h"
 #include "http_server_config.h"
+#include "http_server_builder.h"
 
 //class HttpServerApp {
 //public:
@@ -184,48 +185,54 @@ void update_args(argparse::ArgumentParser &program, HttpServerConfig &config) {
 }
 
 int main(int argc, char *argv[]) {
-//    return HttpServerApp().start(argc, argv);
-
-    argparse::ArgumentParser program("HTTP Server", HttpServer::VERSION);
-    add_args(program);
-
-    try {
-        program.parse_args(argc, argv);
-    }
-    catch (const std::exception &err) {
-        std::cerr << err.what() << std::endl;
-        std::cerr << program;
-
-        return EXIT_FAILURE;
-    }
-
-    auto config_file = program.get("config");
-//    if (std::filesystem::exists(config_file)) {
-//        std::cout << "Carregando arquivo de configuração..." << std::endl;
-//        HttpServerConfig config(config_file);
-//        std::cout << "Atualizando configuração..." << std::endl;
-//        update_args(program, config);
-//        config.print();
-//    } else {
-//        HttpServerConfig config;
-//        update_args(program, config);
-//        std::cout << "Gravar este arquivo de configurações em " << config_file << std::endl;
-//        config.print();
+////    return HttpServerApp().start(argc, argv);
+//
+//    argparse::ArgumentParser program("HTTP Server", HttpServer::VERSION);
+//    add_args(program);
+//
+//    try {
+//        program.parse_args(argc, argv);
 //    }
+//    catch (const std::exception &err) {
+//        std::cerr << err.what() << std::endl;
+//        std::cerr << program;
+//
+//        return EXIT_FAILURE;
+//    }
+//
+//    auto config_file = program.get("config");
+////    if (std::filesystem::exists(config_file)) {
+////        std::cout << "Carregando arquivo de configuração..." << std::endl;
+////        HttpServerConfig config(config_file);
+////        std::cout << "Atualizando configuração..." << std::endl;
+////        update_args(program, config);
+////        config.print();
+////    } else {
+////        HttpServerConfig config;
+////        update_args(program, config);
+////        std::cout << "Gravar este arquivo de configurações em " << config_file << std::endl;
+////        config.print();
+////    }
+//
+//    HttpServerConfig config(std::filesystem::exists(config_file) ? config_file : "");
+//    update_args(program, config);
+//    config.print();
+//
+//    if (!std::filesystem::exists(config_file)) {
+//        std::cout << "Gravar este arquivo de configurações em " << config_file << std::endl;
+//    }
+//
+//    std::string log_file;
+//    if (program.is_used("log")) {
+//        log_file = program.get("log").empty() ? "log.txt" : program.get("log");
+//    }
+//    bool is_verbose = program.is_used("verbose");
 
-    HttpServerConfig config(std::filesystem::exists(config_file) ? config_file : "");
-    update_args(program, config);
-    config.print();
+    HttpServer server = HttpServerBuilder()
+            .byCommandLineArgs(argc, argv)
+            .build();
 
-    if (!std::filesystem::exists(config_file)) {
-        std::cout << "Gravar este arquivo de configurações em " << config_file << std::endl;
-    }
-
-    std::string log_file;
-    if (program.is_used("log")) {
-        log_file = program.get("log").empty() ? "log.txt" : program.get("log");
-    }
-    bool is_verbose = program.is_used("verbose");
+    server.start();
 
     return EXIT_SUCCESS;
 }
