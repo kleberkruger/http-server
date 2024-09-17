@@ -175,17 +175,14 @@ HttpServerBuilder &HttpServerBuilder::byConfigFile(std::string_view config_file)
 }
 
 HttpServer HttpServerBuilder::build() const {
-    std::cout << "Info:\n";
-    std::cout << "  name: " << _name << "\n";
-    std::cout << "  version: " << HttpServer::VERSION << "\n";
     std::cout << "Server:\n";
+    std::cout << "  name: " << _name << "\n";
     std::cout << "  port: " << _port << "\n";
     std::cout << "  homepage: " << _homepage << "\n";
     std::cout << "  mode: " << HttpServerMode::toString(_mode) << "\n";
     std::cout << "  keep-alive: " << (_keep_alive ? "true" : "false") << "\n";
     std::cout << "  max simultaneous connections: " << _max_simultaneous_connections << "\n";
     std::cout << "  max pending connections: " << _max_pending_connections << "\n";
-
     std::cout << "Resource:\n";
     std::cout << "  cgi-bin: " << _cgi_bin_dir << "\n";
     std::cout << "  www: " << _root_dir << "\n";

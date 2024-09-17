@@ -17,7 +17,8 @@ public:
                                    _mode(DEFAULT_MODE),
                                    _max_simultaneous_connections(DEFAULT_MAX_SIMULTANEOUS_CONNECTIONS),
                                    _max_pending_connections(DEFAULT_MAX_PENDING_CONNECTIONS),
-                                   _keep_alive(DEFAULT_KEEP_ALIVE) {}
+                                   _keep_alive(DEFAULT_KEEP_ALIVE),
+                                   _verbose(DEFAULT_VERBOSE) {}
 
     ~HttpServerBuilder() = default;
 
@@ -109,9 +110,10 @@ private:
     static constexpr uint32_t DEFAULT_MAX_SIMULTANEOUS_CONNECTIONS = 100;
     static constexpr uint32_t DEFAULT_MAX_PENDING_CONNECTIONS = 100;
     static constexpr bool DEFAULT_KEEP_ALIVE = true;
+    static constexpr bool DEFAULT_VERBOSE = false;
 
     std::string _name;
-    uint16_t _port{};
+    uint16_t _port;
     std::string _cgi_bin_dir;
     std::string _root_dir;
     std::string _homepage;

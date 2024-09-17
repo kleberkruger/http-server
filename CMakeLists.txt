@@ -21,12 +21,12 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(yaml-cpp)
 
 add_executable(http-server main.cpp
-        http_server_config.cpp
-        http_server_config.h
         http_server.cpp
         http_server.h
         http_server_mode.h
         http_server_builder.cpp
         http_server_builder.h
+        socket_server.cpp
+        socket_server.h
 )
 target_link_libraries(http-server PRIVATE argparse::argparse yaml-cpp::yaml-cpp)
