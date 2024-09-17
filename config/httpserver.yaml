@@ -1,0 +1,27 @@
+# Arquivo de configuração em formato YAML (YAML Ain't Markup Language)
+server:
+  name: "SI-CPCX-UFMS"
+  port: 8080
+  homepage: "index.html"
+  mode: "fork"
+  max_simultaneous_connections: 10
+  max_pending_connections: 10
+  keep_alive: true
+resource:
+  cgi_bin: "../resources/cgi-bin"
+  root_dir: "../resources/www"
+
+# Exemplo de futuros mapeamentos...
+mapping:
+  index.html:
+    - "index.htm"
+    - "home.htm"
+    - "home.html"
+    - "homepage.htm"
+    - "homepage.html"
+    - "inicio.htm"
+    - "inicio.html"
+  esportes.html:
+    - "esporte.htm"
+    - "esporte.html"
+  formula1.html: "f1.html"
