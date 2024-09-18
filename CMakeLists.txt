@@ -28,5 +28,6 @@ add_executable(http-server main.cpp
         http_server_builder.h
         socket_server.cpp
         socket_server.h
+        http_server_config.h
 )
 target_link_libraries(http-server PRIVATE argparse::argparse yaml-cpp::yaml-cpp)

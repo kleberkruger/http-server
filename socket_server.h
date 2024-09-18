@@ -4,7 +4,6 @@
 #include <cstdint>
 #include "http_server_mode.h"
 
-
 class SocketServer {
 public:
 
@@ -33,8 +32,6 @@ protected:
     void runOnForkMode(int server_fd);
 
     void runOnThreadMode(int server_fd);
-
-    void runOnThreadPoolMode(int server_fd);
 
     void runOnNonBlockingMode(int server_fd);
 

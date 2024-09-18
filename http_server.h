@@ -9,6 +9,12 @@ class HttpServer {
 public:
     static constexpr const char *VERSION = "1.0";
 
+//    HttpServer(std::string_view name, uint16_t port,
+//               std::string_view cgi_bin_dir, std::string_view root_dir,
+//               std::string_view homepage, HttpServerMode::Type mode,
+//               uint32_t max_simultaneous_connections, uint32_t max_pending_connections,
+//               bool keep_alive, std::string_view log_file, bool verbose);
+
     void start();
 
 private:

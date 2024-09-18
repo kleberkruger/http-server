@@ -1,4 +1,5 @@
 #include "http_server_builder.h"
+#include "http_server_config.h"
 #include <filesystem>
 #include <yaml-cpp/yaml.h>
 
@@ -64,7 +65,7 @@ void HttpServerBuilder::addAndParseArgs(argparse::ArgumentParser &program, int a
     }
 }
 
-HttpServerBuilder &HttpServerBuilder::byCommandLineArgs(int argc, char *argv[], bool use_config_file) {
+auto HttpServerBuilder::byCommandLineArgs(int argc, char *argv[], bool use_config_file) -> HttpServerBuilder & {
     argparse::ArgumentParser program("HTTP Server", HttpServer::VERSION);
     addAndParseArgs(program, argc, argv, use_config_file);
 
@@ -77,58 +78,39 @@ HttpServerBuilder &HttpServerBuilder::byCommandLineArgs(int argc, char *argv[], 
         byConfigFile(config_file);
     }
 
-    std::string mode_in_use = program.is_used("sync") ? "sync" :
-                              program.is_used("fork") ? "fork" :
-                              program.is_used("thread") ? "thread" :
-                              program.is_used("async") ? "async" :
-                              "";
-    if (!mode_in_use.empty()) {
-        _mode = HttpServerMode::toEnum(mode_in_use);
+    std::optional<std::string> mode_in_use =
+            program.is_used("sync") ? std::optional<std::string>("sync") :
+            program.is_used("fork") ? std::optional<std::string>("fork") :
+            program.is_used("thread") ? std::optional<std::string>("thread") :
+            program.is_used("async") ? std::optional<std::string>("async") :
+            std::nullopt;
+
+    if (mode_in_use.has_value()) {
+        _mode = HttpServerMode::toEnum(mode_in_use.value());
+        auto args = program.get<std::vector<uint32_t>>(mode_in_use.value());
         if (_mode == HttpServerMode::Type::SYNC) {
             _max_simultaneous_connections = 1;
-        }
-        auto args = program.get<std::vector<uint32_t>>(mode_in_use);
-        if (!args.empty()) {
-            if (_mode == HttpServerMode::Type::SYNC) {
-                _max_pending_connections = args[0];
-            } else {
-                _max_simultaneous_connections = args[0];
-            }
-            if (args.size() > 1) {
-                _max_pending_connections = args[1];
-            }
+            if (!args.empty()) _max_pending_connections = args[0];
+        } else {
+            if (!args.empty()) _max_pending_connections = args[0];
+            if (args.size() > 1) _max_pending_connections = args[1];
         }
     }
 
-    if (program.is_used("name")) {
-        _name = program.get("name");
-    }
-    if (program.is_used("port")) {
-        _port = program.get<uint16_t>("port");
-    }
-    if (program.is_used("home")) {
-        _homepage = program.get("home");
-    }
+    if (program.is_used("name")) _name = program.get("name");
+    if (program.is_used("port")) _port = program.get<uint16_t>("port");
+    if (program.is_used("home")) _homepage = program.get("home");
     if (program.is_used("path")) {
         auto args = program.get<std::vector<std::string>>("path");
-        if (!args.empty()) {
-            _root_dir = args[0];
-            if (args.size() > 1) {
-                _cgi_bin_dir = args[1];
-            }
-        }
-    }
-    if (program.is_used("no-keep-alive")) {
-        _keep_alive = false;
+        _root_dir = args[0];
+        if (args.size() > 1) _cgi_bin_dir = args[1];
     }
     if (program.is_used("log")) {
         auto args = program.get<std::vector<std::string>>("log");
         _log_file = !args.empty() ? args[0] : "log.txt";
-        std::cout << "Log: [" << _log_file << "]\n";
     }
-    if (program.is_used("verbose")) {
-        _verbose = true;
-    }
+    if (program.is_used("no-keep-alive")) _keep_alive = false;
+    if (program.is_used("verbose")) _verbose = true;
 
     if (saveConfig) {
         saveConfigFile(program.get("config"));
@@ -137,7 +119,7 @@ HttpServerBuilder &HttpServerBuilder::byCommandLineArgs(int argc, char *argv[], 
     return *this;
 }
 
-HttpServerBuilder &HttpServerBuilder::byConfigFile(std::string_view config_file) {
+auto HttpServerBuilder::byConfigFile(std::string_view config_file) -> HttpServerBuilder & {
     try {
         YAML::Node config = YAML::LoadFile(config_file.data());
 
@@ -187,7 +169,7 @@ HttpServer HttpServerBuilder::build() const {
     std::cout << "  cgi-bin: " << _cgi_bin_dir << "\n";
     std::cout << "  www: " << _root_dir << "\n";
 
-    return HttpServer();
+    return {};
 }
 
 void HttpServerBuilder::saveConfigFile(std::string_view config_file) {

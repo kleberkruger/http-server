@@ -2,6 +2,7 @@
 #define HTTP_SERVER_HTTP_SERVER_BUILDER_H
 
 #include <cstdint>
+#include <expected>
 #include <argparse/argparse.hpp>
 #include "http_server_mode.h"
 #include "http_server.h"
@@ -22,55 +23,55 @@ public:
 
     ~HttpServerBuilder() = default;
 
-    HttpServerBuilder &setName(const std::string &name) {
+    auto setName(std::string_view name) -> HttpServerBuilder & {
         _name = name;
         return *this;
     }
 
-    HttpServerBuilder &setPort(const uint16_t port) {
+    auto setPort(const uint16_t port) -> HttpServerBuilder & {
         _port = port;
         return *this;
     }
 
-    HttpServerBuilder &setCGIDirectory(const std::string &cgi_bin_dir) {
+    auto setCGIDirectory(const std::string &cgi_bin_dir) -> HttpServerBuilder & {
         _cgi_bin_dir = cgi_bin_dir;
         return *this;
     }
 
-    HttpServerBuilder &setRootDirectory(const std::string &root_dir) {
+    auto setRootDirectory(const std::string &root_dir) -> HttpServerBuilder & {
         _root_dir = root_dir;
         return *this;
     }
 
-    HttpServerBuilder &setPaths(const std::string &root_dir, const std::string &cgi_bin_dir) {
+    auto setPaths(const std::string &root_dir, const std::string &cgi_bin_dir) -> HttpServerBuilder & {
         _root_dir = root_dir;
         _cgi_bin_dir = cgi_bin_dir;
         return *this;
     }
 
-    HttpServerBuilder &setHomepage(const std::string &homepage) {
+    auto setHomepage(const std::string &homepage) -> HttpServerBuilder & {
         _homepage = homepage;
         return *this;
     }
 
-    HttpServerBuilder &setMode(const HttpServerMode::Type mode) {
+    auto setMode(const HttpServerMode::Type mode) -> HttpServerBuilder & {
         _mode = mode;
         return *this;
     }
 
-    HttpServerBuilder &setMaxSimultaneousConnections(const uint32_t max_simultaneous_connections) {
+    auto setMaxSimultaneousConnections(const uint32_t max_simultaneous_connections) -> HttpServerBuilder & {
         _max_simultaneous_connections = max_simultaneous_connections;
         return *this;
     }
 
-    HttpServerBuilder &setMaxPendingConnections(const uint32_t max_pending_connections) {
+    auto setMaxPendingConnections(const uint32_t max_pending_connections) -> HttpServerBuilder & {
         _max_pending_connections = max_pending_connections;
         return *this;
     }
 
-    HttpServerBuilder &setModeAndMaxConnections(const HttpServerMode::Type mode,
-                                                const uint32_t max_simultaneous_connections,
-                                                const uint32_t max_pending_connections) {
+    auto setModeAndMaxConnections(const HttpServerMode::Type mode,
+                                  const uint32_t max_simultaneous_connections,
+                                  const uint32_t max_pending_connections) -> HttpServerBuilder & {
         _mode = mode;
         _max_simultaneous_connections = max_simultaneous_connections;
         _max_pending_connections = max_pending_connections;
@@ -78,26 +79,26 @@ public:
         return *this;
     }
 
-    HttpServerBuilder &setKeepAlive(const bool keep_alive) {
+    auto setKeepAlive(const bool keep_alive) -> HttpServerBuilder & {
         _keep_alive = keep_alive;
         return *this;
     }
 
-    HttpServerBuilder &setLogFile(const std::string &log_file) {
+    auto setLogFile(const std::string &log_file) -> HttpServerBuilder & {
         _log_file = log_file;
         return *this;
     }
 
-    HttpServerBuilder &setVerbose(const bool verbose) {
+    auto setVerbose(const bool verbose) -> HttpServerBuilder & {
         _verbose = verbose;
         return *this;
     }
 
-    HttpServerBuilder &byCommandLineArgs(int argc, char *argv[], bool use_config_file = true);
+    auto byCommandLineArgs(int argc, char *argv[], bool use_config_file = true) -> HttpServerBuilder &;
 
-    HttpServerBuilder &byConfigFile(std::string_view config_file);
+    auto byConfigFile(std::string_view config_file) -> HttpServerBuilder &;
 
-    HttpServer build() const;
+    [[nodiscard]] HttpServer build() const;
 
 private:
 
@@ -118,10 +119,10 @@ private:
     std::string _root_dir;
     std::string _homepage;
     HttpServerMode::Type _mode;
-    uint32_t _max_simultaneous_connections;
+    uint32_t _max_simultaneous_connections; // talvez std::optional
     uint32_t _max_pending_connections;
     bool _keep_alive;
-    std::string _log_file;
+    std::optional<std::string> _log_file = std::nullopt;
     bool _verbose;
 
     void saveConfigFile(std::string_view config_file);
