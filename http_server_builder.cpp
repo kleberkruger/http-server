@@ -1,6 +1,7 @@
 #include "http_server_builder.h"
 #include "http_server_config.h"
 #include <filesystem>
+#include <fstream>
 #include <yaml-cpp/yaml.h>
 
 void HttpServerBuilder::addAndParseArgs(argparse::ArgumentParser &program, int argc, char *argv[],
@@ -38,7 +39,7 @@ void HttpServerBuilder::addAndParseArgs(argparse::ArgumentParser &program, int a
             .scan<'i', uint16_t>();
 
     program.add_argument("--home")
-            .help("sets home address");
+            .help("sets the homepage");
 
     program.add_argument("--path")
             .help("sets the path of <root> <cgi-bin> directories")
@@ -152,6 +153,7 @@ auto HttpServerBuilder::byConfigFile(std::string_view config_file) -> HttpServer
 
     } catch (const YAML::Exception &e) {
         std::cerr << e.what() << std::endl;
+        exit(EXIT_FAILURE);
     }
     return *this;
 }
@@ -173,17 +175,21 @@ HttpServer HttpServerBuilder::build() const {
 }
 
 void HttpServerBuilder::saveConfigFile(std::string_view config_file) {
-    std::cout << "Salvando arquivo de configuração: " << config_file << std::endl;
+    YAML::Node config;
 
-    std::cout << "Server:\n";
-    std::cout << "  name: " << _name << "\n";
-    std::cout << "  port: " << _port << "\n";
-    std::cout << "  homepage: " << _homepage << "\n";
-    std::cout << "  mode: " << HttpServerMode::toString(_mode) << "\n";
-    std::cout << "  keep-alive: " << (_keep_alive ? "true" : "false") << "\n";
-    std::cout << "  max simultaneous connections: " << _max_simultaneous_connections << "\n";
-    std::cout << "  max pending connections: " << _max_pending_connections << "\n";
-    std::cout << "Resource:\n";
-    std::cout << "  cgi-bin: " << _cgi_bin_dir << "\n";
-    std::cout << "  www: " << _root_dir << "\n";
+    auto server = config["server"];
+    server["name"] = _name;
+    server["port"] = _port;
+    server["homepage"] = _homepage;
+    server["mode"] = HttpServerMode::toString(_mode);
+    server["keep_alive"] = _keep_alive ? "true" : "false";
+    server["max_simultaneous_connections"] = _max_simultaneous_connections;
+    server["max_pending_connections"] = _max_pending_connections;
+
+    auto resource = config["resource"];
+    resource["cgi_bin"] = _cgi_bin_dir;
+    resource["root_dir"] = _root_dir;
+
+    std::ofstream fout(config_file.data());
+    fout << config;
 }
